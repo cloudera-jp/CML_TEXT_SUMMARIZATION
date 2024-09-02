@@ -122,14 +122,14 @@ def summarize(modelId, input_text, instruction_text, max_tokens, temperature, to
 
 with gr.Blocks() as demo:
   with gr.Row():
-    gr.Markdown("# Amazon Bedrock Text Summarization")
-    example_holder = gr.Textbox(visible=False, label="Input Text", value="example")
+    gr.Markdown("# Text SummarizationによるOCR抽出情報のクレンジング")
+    example_holder = gr.Textbox(visible=False, label="サンプルテキスト", value="example")
   with gr.Row():
-    modelId = gr.Dropdown(label="Choose a Bedrock Model:", choices=models, value='amazon.titan-tg1-large')
+    modelId = gr.Dropdown(label="Bedrock Modelの選択", choices=models, value='anthropic.claude-3-5-sonnet-20240620-v1:0')
   with gr.Row():
     with gr.Column(scale=4):
-      custom_instruction = gr.Textbox(label="Input your prompt instruction:", value=example_instruction)
-      input_text = gr.Textbox(label="Input your text", placeholder="Insert some long text here...")
+      custom_instruction = gr.Textbox(label="プロンプト:", value=example_instruction)
+      input_text = gr.Textbox(label="OCR抽出情報", placeholder="クレンジング対象のテキストを入力")
       example = gr.Examples(examples=[[example_instruction, "CML Documentation"]], inputs=[custom_instruction, example_holder])
     with gr.Column(scale=4):
       with gr.Accordion("Advanced Generation Options", open=False):
@@ -144,10 +144,10 @@ with gr.Blocks() as demo:
           region = gr.Markdown("**Region**: "+os.getenv('AWS_DEFAULT_REGION'))
           access_key = gr.Markdown("**Access Key**: "+os.getenv('AWS_ACCESS_KEY_ID'))
           secret_key = gr.Markdown("**Secret Key**: *****")
-      summarize_btn = gr.Button("Summarize", variant='primary')
-      reset_btn = gr.Button("Reset")
+      summarize_btn = gr.Button("実行", variant='primary')
+      reset_btn = gr.Button("リセット")
     with gr.Column(scale=4):
-      output = gr.Textbox(label="Output Text")
+      output = gr.Textbox(label="Bedrockからの応答")
   summarize_btn.click(fn=summarize, inputs=[modelId, input_text, custom_instruction, max_new_tokens, temperature, top_p], outputs=output, 
                             api_name="summarize")
   reset_btn.click(fn=clear_out, inputs=[], outputs=[input_text, output, example_holder, custom_instruction], show_progress=False)
