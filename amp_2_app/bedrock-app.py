@@ -21,7 +21,7 @@ def clear_out():
   return cleared_tuple
 
 # List of LLM models to use for text summarization
-models = ['amazon.titan-tg1-large', 'anthropic.claude-v2:1']
+models = ['amazon.titan-tg1-large', 'anthropic.claude-v2:1', 'anthropic.claude-3-5-sonnet-20240620-v1:0']
 
 # Setting up the prompt syntax for the corresponding model
 def prompt_construction(modelId, instruction="[instruction]", prompt="[input_text]"):
@@ -30,7 +30,11 @@ def prompt_construction(modelId, instruction="[instruction]", prompt="[input_tex
   elif modelId == 'anthropic.claude-v2:1':
     full_prompt = """Human: """ + instruction + """\n<text>""" + prompt + """</text>
 Assistant:"""
-  
+  elif modelId == 'anthropic.claude-3-5-sonnet-20240620-v1:0':
+        full_prompt = [
+            {"role": "user", "content": instruction + "\n<text>" + prompt + "</text>"}
+        ]
+    
   return full_prompt
 
 # Setting up the API call in the correct format for the corresponding model
@@ -50,6 +54,14 @@ def json_format(modelId, tokens, temperature, top_p, full_prompt="[input text]")
                  "top_p":top_p,
                  "stop_sequences":[]
                   })
+  elif modelId == 'anthropic.claude-3-5-sonnet-20240620-v1:0':
+    body = json.dumps({
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": tokens,
+            "messages": full_prompt,
+            "temperature": temperature,
+            "top_p": top_p
+            })
     
   return body
 
@@ -69,6 +81,14 @@ def display_format(modelId):
                  "top_p":"[top_p]",
                  "stop_sequences":[]
                   })
+  elif modelId == 'anthropic.claude-3-5-sonnet-20240620-v1:0':
+    body = json.dumps({
+            "anthropic_version": "bedrock-2023-05-31",
+            "max_tokens": "[max_tokens]",
+            "messages": [{"role": "user", "content": "[input_text]"}],
+            "temperature": "[temperature]",
+            "top_p": "[top_p]"
+            })
   return body
 
 def summarize(modelId, input_text, instruction_text, max_tokens, temperature, top_p):
@@ -88,7 +108,16 @@ def summarize(modelId, input_text, instruction_text, max_tokens, temperature, to
     result = response_body.get('results')[0].get('outputText')
   elif modelId == 'anthropic.claude-v2:1':
     result = response_body.get('completion')
+  elif modelId == 'anthropic.claude-3-5-sonnet-20240620-v1:0':
+    result = response_body['content'][0]['text']
 
+#  if isinstance(result, str):
+#    return result.strip('\n')
+#  elif isinstance(result, list):
+#    return [item.strip('\n') for item in result if isinstance(item, str)]
+#  else:
+#    return str(result).strip('\n')
+  
   return result.strip('\n')
 
 with gr.Blocks() as demo:
