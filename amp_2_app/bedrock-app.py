@@ -14,7 +14,8 @@ def example_lookup(text):
     return examples[text]
   return ''
 
-example_instruction = "Please provide a summary of the following text. Do not add any information that is not mentioned in the text below."
+# example_instruction = "Please provide a summary of the following text. Do not add any information that is not mentioned in the text below."
+example_instruction = "以下のテキストのJSONから発電所の設備名称として適当なものだけを選んで、同じようなJSON形式で回答してください。"
 
 def clear_out():
   cleared_tuple = (gr.Textbox.update(value=""), gr.Textbox.update(value=""), gr.Textbox.update(value=""), gr.Textbox.update(value=""))
@@ -119,6 +120,7 @@ def summarize(modelId, input_text, instruction_text, max_tokens, temperature, to
 #    return str(result).strip('\n')
   
   return result.strip('\n')
+#  return full_prompt
 
 with gr.Blocks() as demo:
   with gr.Row():
