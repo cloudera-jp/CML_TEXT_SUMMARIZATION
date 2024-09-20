@@ -119,8 +119,8 @@ def summarize(modelId, input_text, instruction_text, max_tokens, temperature, to
 #  else:
 #    return str(result).strip('\n')
   
-  return result.strip('\n')
-#  return full_prompt
+#  return result.strip('\n')
+  return full_prompt
 
 with gr.Blocks() as demo:
   with gr.Row():
